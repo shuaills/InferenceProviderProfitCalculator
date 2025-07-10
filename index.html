@@ -265,6 +265,7 @@
             currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
             localStorage.setItem('language', currentLanguage);
             updateLanguage();
+            calculate(); // Recalculate to ensure intermediate values are displayed correctly
         }
 
         function updateLanguage() {
@@ -298,10 +299,14 @@
             document.getElementById('intermediateTitle').textContent = t.intermediateTitle;
             document.getElementById('footerText').textContent = t.footerText;
             
-            // Update intermediate values text (keeping the values intact)
-            const revenueValue = document.getElementById('revenuePerHour').textContent;
-            const tokensValue = document.getElementById('totalTokensPerHour').textContent;
-            const timeValue = document.getElementById('timePerRequest').textContent;
+            // Update intermediate values text (preserving existing values if they exist)
+            const revenueEl = document.getElementById('revenuePerHour');
+            const tokensEl = document.getElementById('totalTokensPerHour');
+            const timeEl = document.getElementById('timePerRequest');
+            
+            const revenueValue = revenueEl ? revenueEl.textContent : '';
+            const tokensValue = tokensEl ? tokensEl.textContent : '';
+            const timeValue = timeEl ? timeEl.textContent : '';
             
             document.getElementById('revenuePerHourText').innerHTML = 
                 t.revenuePerHourText + '<strong id="revenuePerHour" class="font-mono text-gray-800">' + revenueValue + '</strong>';
@@ -321,13 +326,6 @@
         const inputPriceInput = document.getElementById('inputPrice');
         const outputPriceInput = document.getElementById('outputPrice');
         
-        const computeCostResultEl = document.getElementById('computeCostResult');
-        const blendedPriceResultEl = document.getElementById('blendedPriceResult');
-        const grossMarginResultEl = document.getElementById('grossMarginResult');
-        const revenuePerHourEl = document.getElementById('revenuePerHour');
-        const totalTokensPerHourEl = document.getElementById('totalTokensPerHour');
-        const timePerRequestEl = document.getElementById('timePerRequest');
-
         /**
          * Reads input values, calculates costs and margins, and updates the UI.
          */
@@ -373,13 +371,21 @@
             const grossMargin = totalRevenuePerHour > 0 ? ((totalRevenuePerHour - gpuRentalCost) / totalRevenuePerHour) * 100 : 0;
 
             // --- 3. Update the UI with formatted results ---
-            computeCostResultEl.textContent = `$${computeCostPerMillion.toFixed(3)}`;
-            blendedPriceResultEl.textContent = `$${blendedSellingPrice.toFixed(3)}`;
-            grossMarginResultEl.textContent = `${grossMargin.toFixed(1)}%`;
+            // Get fresh references to result elements (in case they were recreated by language switching)
+            const computeCostResultEl = document.getElementById('computeCostResult');
+            const blendedPriceResultEl = document.getElementById('blendedPriceResult');
+            const grossMarginResultEl = document.getElementById('grossMarginResult');
+            const revenuePerHourEl = document.getElementById('revenuePerHour');
+            const totalTokensPerHourEl = document.getElementById('totalTokensPerHour');
+            const timePerRequestEl = document.getElementById('timePerRequest');
+
+            if (computeCostResultEl) computeCostResultEl.textContent = `$${computeCostPerMillion.toFixed(3)}`;
+            if (blendedPriceResultEl) blendedPriceResultEl.textContent = `$${blendedSellingPrice.toFixed(3)}`;
+            if (grossMarginResultEl) grossMarginResultEl.textContent = `${grossMargin.toFixed(1)}%`;
             
-            revenuePerHourEl.textContent = `$${totalRevenuePerHour.toFixed(2)}`;
-            totalTokensPerHourEl.textContent = totalTokensPerHour.toLocaleString('en-US', { maximumFractionDigits: 0 });
-            timePerRequestEl.textContent = `${timePerRequest.toFixed(2)}s`;
+            if (revenuePerHourEl) revenuePerHourEl.textContent = `$${totalRevenuePerHour.toFixed(2)}`;
+            if (totalTokensPerHourEl) totalTokensPerHourEl.textContent = totalTokensPerHour.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            if (timePerRequestEl) timePerRequestEl.textContent = `${timePerRequest.toFixed(2)}s`;
         }
 
         // --- Event Listeners ---
