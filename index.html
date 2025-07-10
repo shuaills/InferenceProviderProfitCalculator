@@ -55,13 +55,32 @@
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
+        .language-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .language-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
     <div class="max-w-5xl mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">LLM 推理服务提供商成本计算器 (高级版)</h1>
-            <p class="mt-2 text-gray-600">分别计算输入和输出的成本与利润，更精确地模拟真实业务场景。</p>
+        <header class="text-center mb-8 relative">
+            <button id="languageToggle" class="language-toggle absolute top-0 right-0">
+                English
+            </button>
+            <h1 id="mainTitle" class="text-3xl font-bold text-gray-800">LLM 推理服务提供商成本计算器</h1>
+            <p id="mainDescription" class="mt-2 text-gray-600">分别计算输入和输出的成本与利润，更精确地模拟真实业务场景。</p>
         </header>
 
         <div class="calculator-card p-6 md:p-8">
@@ -69,17 +88,17 @@
                 <!-- Input Parameters Section -->
                 <div class="space-y-8">
                     <div>
-                        <h2 class="section-title">核心成本与利用率</h2>
+                        <h2 id="coreTitle" class="section-title">核心成本与利用率</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="input-group">
-                                <label for="gpuRentalCost" class="font-medium text-gray-700">GPU 租赁成本</label>
+                                <label for="gpuRentalCost" id="gpuCostLabel" class="font-medium text-gray-700">GPU 租赁成本</label>
                                 <div class="flex items-center">
                                     <input type="number" id="gpuRentalCost" class="input-field" value="2.00" step="0.01">
                                     <span class="unit-label">USD/hr</span>
                                 </div>
                             </div>
                             <div class="input-group">
-                                <label for="utilizationRate" class="font-medium text-gray-700">有效利用率</label>
+                                <label for="utilizationRate" id="utilizationLabel" class="font-medium text-gray-700">有效利用率</label>
                                 <div class="flex items-center">
                                     <input type="number" id="utilizationRate" class="input-field" value="75" max="100" min="0">
                                     <span class="unit-label">%</span>
@@ -89,40 +108,40 @@
                     </div>
 
                     <div>
-                        <h2 class="section-title">典型请求负载</h2>
-                        <p class="text-sm text-gray-500 mb-4">定义一个典型 API 请求包含的 Token 数量。</p>
+                        <h2 id="loadTitle" class="section-title">典型请求负载</h2>
+                        <p id="loadDescription" class="text-sm text-gray-500 mb-4">定义一个典型 API 请求包含的 Token 数量。</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="input-group">
-                                <label for="inputTokens" class="font-medium text-gray-700">输入 Tokens</label>
+                                <label for="inputTokens" id="inputTokensLabel" class="font-medium text-gray-700">输入 Tokens</label>
                                 <input type="number" id="inputTokens" class="input-field" value="1000">
                             </div>
                             <div class="input-group">
-                                <label for="outputTokens" class="font-medium text-gray-700">输出 Tokens</label>
+                                <label for="outputTokens" id="outputTokensLabel" class="font-medium text-gray-700">输出 Tokens</label>
                                 <input type="number" id="outputTokens" class="input-field" value="4000">
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <h2 class="section-title">性能与定价</h2>
+                        <h2 id="performanceTitle" class="section-title">性能与定价</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="input-group">
-                                <label for="inputThroughput" class="font-medium text-gray-700">输入吞吐 (Prefill)</label>
+                                <label for="inputThroughput" id="inputThroughputLabel" class="font-medium text-gray-700">输入吞吐 (Prefill)</label>
                                 <input type="number" id="inputThroughput" class="input-field" value="2000">
                                 <span class="text-xs text-gray-500">Tokens/s/GPU</span>
                             </div>
                             <div class="input-group">
-                                <label for="outputThroughput" class="font-medium text-gray-700">输出吞吐 (Decode)</label>
+                                <label for="outputThroughput" id="outputThroughputLabel" class="font-medium text-gray-700">输出吞吐 (Decode)</label>
                                 <input type="number" id="outputThroughput" class="input-field" value="400">
                                 <span class="text-xs text-gray-500">Tokens/s/GPU</span>
                             </div>
                             <div class="input-group">
-                                <label for="inputPrice" class="font-medium text-gray-700">输入 Token 定价</label>
+                                <label for="inputPrice" id="inputPriceLabel" class="font-medium text-gray-700">输入 Token 定价</label>
                                 <input type="number" id="inputPrice" class="input-field" value="1.00" step="0.01">
                                 <span class="text-xs text-gray-500">USD/M Tokens</span>
                             </div>
                             <div class="input-group">
-                                <label for="outputPrice" class="font-medium text-gray-700">输出 Token 定价</label>
+                                <label for="outputPrice" id="outputPriceLabel" class="font-medium text-gray-700">输出 Token 定价</label>
                                 <input type="number" id="outputPrice" class="input-field" value="2.00" step="0.01">
                                 <span class="text-xs text-gray-500">USD/M Tokens</span>
                             </div>
@@ -132,11 +151,11 @@
 
                 <!-- Calculated Results Section -->
                 <div class="space-y-6 bg-gray-50 p-6 rounded-lg border">
-                    <h2 class="section-title">计算结果</h2>
+                    <h2 id="resultsTitle" class="section-title">计算结果</h2>
 
                     <div class="space-y-2">
-                        <h3 class="font-medium text-gray-700">混合推理成本</h3>
-                        <p class="text-gray-500 text-sm">根据负载混合比，每处理 1M Token 的平均硬件成本。</p>
+                        <h3 id="computeCostTitle" class="font-medium text-gray-700">混合推理成本</h3>
+                        <p id="computeCostDescription" class="text-gray-500 text-sm">根据负载混合比，每处理 1M Token 的平均硬件成本。</p>
                         <div>
                             <span id="computeCostResult" class="result-value">$0.000</span>
                             <span class="unit-label">/ M Tokens</span>
@@ -144,8 +163,8 @@
                     </div>
                     
                     <div class="space-y-2">
-                        <h3 class="font-medium text-gray-700">混合平均售价</h3>
-                        <p class="text-gray-500 text-sm">根据负载混合比和定价，每售出 1M Token 的平均收入。</p>
+                        <h3 id="blendedPriceTitle" class="font-medium text-gray-700">混合平均售价</h3>
+                        <p id="blendedPriceDescription" class="text-gray-500 text-sm">根据负载混合比和定价，每售出 1M Token 的平均收入。</p>
                         <div>
                             <span id="blendedPriceResult" class="result-value">$0.000</span>
                             <span class="unit-label">/ M Tokens</span>
@@ -153,19 +172,19 @@
                     </div>
 
                     <div class="space-y-2">
-                        <h3 class="font-medium text-gray-700">毛利率 (Gross Margin)</h3>
-                        <p class="text-gray-500 text-sm">（总收入 - 总成本）/ 总收入</p>
+                        <h3 id="grossMarginTitle" class="font-medium text-gray-700">毛利率 (Gross Margin)</h3>
+                        <p id="grossMarginDescription" class="text-gray-500 text-sm">（总收入 - 总成本）/ 总收入</p>
                         <div>
                             <span id="grossMarginResult" class="result-value">0.0%</span>
                         </div>
                     </div>
                     
                     <div class="space-y-4 pt-4 border-t mt-4">
-                        <h3 class="font-medium text-gray-700">中间值</h3>
+                        <h3 id="intermediateTitle" class="font-medium text-gray-700">中间值</h3>
                         <div class="text-sm space-y-2 text-gray-600">
-                           <p>每小时有效收入: <strong id="revenuePerHour" class="font-mono text-gray-800"></strong></p>
-                           <p>每小时总有效 Tokens: <strong id="totalTokensPerHour" class="font-mono text-gray-800"></strong></p>
-                           <p>单个请求耗时: <strong id="timePerRequest" class="font-mono text-gray-800"></strong></p>
+                           <p id="revenuePerHourText">每小时有效收入: <strong id="revenuePerHour" class="font-mono text-gray-800"></strong></p>
+                           <p id="totalTokensPerHourText">每小时总有效 Tokens: <strong id="totalTokensPerHour" class="font-mono text-gray-800"></strong></p>
+                           <p id="timePerRequestText">单个请求耗时: <strong id="timePerRequest" class="font-mono text-gray-800"></strong></p>
                         </div>
                     </div>
                 </div>
@@ -173,11 +192,125 @@
         </div>
         
         <footer class="text-center mt-8 text-sm text-gray-500">
-            <p>数据和计算逻辑源自 SemiAnalysis，并根据输入/输出分离模式进行扩展。</p>
+            <p id="footerText">数据和计算逻辑源自 SemiAnalysis，并根据输入/输出分离模式进行扩展。</p>
         </footer>
     </div>
 
     <script>
+        // --- Language Support ---
+        const translations = {
+            'zh': {
+                languageToggle: 'English',
+                mainTitle: 'LLM 推理服务提供商成本计算器',
+                mainDescription: '分别计算输入和输出的成本与利润，更精确地模拟真实业务场景。',
+                coreTitle: '核心成本与利用率',
+                gpuCostLabel: 'GPU 租赁成本',
+                utilizationLabel: '有效利用率',
+                loadTitle: '典型请求负载',
+                loadDescription: '定义一个典型 API 请求包含的 Token 数量。',
+                inputTokensLabel: '输入 Tokens',
+                outputTokensLabel: '输出 Tokens',
+                performanceTitle: '性能与定价',
+                inputThroughputLabel: '输入吞吐 (Prefill)',
+                outputThroughputLabel: '输出吞吐 (Decode)',
+                inputPriceLabel: '输入 Token 定价',
+                outputPriceLabel: '输出 Token 定价',
+                resultsTitle: '计算结果',
+                computeCostTitle: '混合推理成本',
+                computeCostDescription: '根据负载混合比，每处理 1M Token 的平均硬件成本。',
+                blendedPriceTitle: '混合平均售价',
+                blendedPriceDescription: '根据负载混合比和定价，每售出 1M Token 的平均收入。',
+                grossMarginTitle: '毛利率 (Gross Margin)',
+                grossMarginDescription: '（总收入 - 总成本）/ 总收入',
+                intermediateTitle: '中间值',
+                revenuePerHourText: '每小时有效收入: ',
+                totalTokensPerHourText: '每小时总有效 Tokens: ',
+                timePerRequestText: '单个请求耗时: ',
+                footerText: '数据和计算逻辑源自 SemiAnalysis，并根据输入/输出分离模式进行扩展。'
+            },
+            'en': {
+                languageToggle: '中文',
+                mainTitle: 'LLM Inference Provider Cost Calculator',
+                mainDescription: 'Calculate input and output costs and profits separately for more accurate real-world business scenarios.',
+                coreTitle: 'Core Cost & Utilization',
+                gpuCostLabel: 'GPU Rental Cost',
+                utilizationLabel: 'Effective Utilization',
+                loadTitle: 'Typical Request Load',
+                loadDescription: 'Define the token count for a typical API request.',
+                inputTokensLabel: 'Input Tokens',
+                outputTokensLabel: 'Output Tokens',
+                performanceTitle: 'Performance & Pricing',
+                inputThroughputLabel: 'Input Throughput (Prefill)',
+                outputThroughputLabel: 'Output Throughput (Decode)',
+                inputPriceLabel: 'Input Token Pricing',
+                outputPriceLabel: 'Output Token Pricing',
+                resultsTitle: 'Calculation Results',
+                computeCostTitle: 'Blended Inference Cost',
+                computeCostDescription: 'Average hardware cost per 1M tokens processed based on load mix.',
+                blendedPriceTitle: 'Blended Average Price',
+                blendedPriceDescription: 'Average revenue per 1M tokens sold based on load mix and pricing.',
+                grossMarginTitle: 'Gross Margin',
+                grossMarginDescription: '(Total Revenue - Total Cost) / Total Revenue',
+                intermediateTitle: 'Intermediate Values',
+                revenuePerHourText: 'Effective Revenue per Hour: ',
+                totalTokensPerHourText: 'Total Effective Tokens per Hour: ',
+                timePerRequestText: 'Time per Request: ',
+                footerText: 'Data and calculation logic sourced from SemiAnalysis, extended with input/output separation model.'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || 'zh';
+
+        function switchLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('language', currentLanguage);
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            document.documentElement.lang = currentLanguage === 'zh' ? 'zh-CN' : 'en';
+            document.title = t.mainTitle;
+            
+            // Update all text elements
+            document.getElementById('languageToggle').textContent = t.languageToggle;
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('mainDescription').textContent = t.mainDescription;
+            document.getElementById('coreTitle').textContent = t.coreTitle;
+            document.getElementById('gpuCostLabel').textContent = t.gpuCostLabel;
+            document.getElementById('utilizationLabel').textContent = t.utilizationLabel;
+            document.getElementById('loadTitle').textContent = t.loadTitle;
+            document.getElementById('loadDescription').textContent = t.loadDescription;
+            document.getElementById('inputTokensLabel').textContent = t.inputTokensLabel;
+            document.getElementById('outputTokensLabel').textContent = t.outputTokensLabel;
+            document.getElementById('performanceTitle').textContent = t.performanceTitle;
+            document.getElementById('inputThroughputLabel').textContent = t.inputThroughputLabel;
+            document.getElementById('outputThroughputLabel').textContent = t.outputThroughputLabel;
+            document.getElementById('inputPriceLabel').textContent = t.inputPriceLabel;
+            document.getElementById('outputPriceLabel').textContent = t.outputPriceLabel;
+            document.getElementById('resultsTitle').textContent = t.resultsTitle;
+            document.getElementById('computeCostTitle').textContent = t.computeCostTitle;
+            document.getElementById('computeCostDescription').textContent = t.computeCostDescription;
+            document.getElementById('blendedPriceTitle').textContent = t.blendedPriceTitle;
+            document.getElementById('blendedPriceDescription').textContent = t.blendedPriceDescription;
+            document.getElementById('grossMarginTitle').textContent = t.grossMarginTitle;
+            document.getElementById('grossMarginDescription').textContent = t.grossMarginDescription;
+            document.getElementById('intermediateTitle').textContent = t.intermediateTitle;
+            document.getElementById('footerText').textContent = t.footerText;
+            
+            // Update intermediate values text (keeping the values intact)
+            const revenueValue = document.getElementById('revenuePerHour').textContent;
+            const tokensValue = document.getElementById('totalTokensPerHour').textContent;
+            const timeValue = document.getElementById('timePerRequest').textContent;
+            
+            document.getElementById('revenuePerHourText').innerHTML = 
+                t.revenuePerHourText + '<strong id="revenuePerHour" class="font-mono text-gray-800">' + revenueValue + '</strong>';
+            document.getElementById('totalTokensPerHourText').innerHTML = 
+                t.totalTokensPerHourText + '<strong id="totalTokensPerHour" class="font-mono text-gray-800">' + tokensValue + '</strong>';
+            document.getElementById('timePerRequestText').innerHTML = 
+                t.timePerRequestText + '<strong id="timePerRequest" class="font-mono text-gray-800">' + timeValue + '</strong>';
+        }
+
         // --- DOM Element References ---
         const gpuRentalCostInput = document.getElementById('gpuRentalCost');
         const utilizationRateInput = document.getElementById('utilizationRate');
@@ -259,8 +392,14 @@
             input.addEventListener('input', calculate);
         });
 
-        // --- Initial Calculation ---
-        window.addEventListener('load', calculate);
+        // Language toggle event listener
+        document.getElementById('languageToggle').addEventListener('click', switchLanguage);
+
+        // --- Initial Setup ---
+        window.addEventListener('load', () => {
+            updateLanguage();
+            calculate();
+        });
     </script>
 </body>
 </html> 
