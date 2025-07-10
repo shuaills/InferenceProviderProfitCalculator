@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 推理服务提供商成本计算器 (高级版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .calculator-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+        }
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .unit-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-left: 0.5rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">LLM 推理服务提供商成本计算器 (高级版)</h1>
+            <p class="mt-2 text-gray-600">分别计算输入和输出的成本与利润，更精确地模拟真实业务场景。</p>
+        </header>
+
+        <div class="calculator-card p-6 md:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Input Parameters Section -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="section-title">核心成本与利用率</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="input-group">
+                                <label for="gpuRentalCost" class="font-medium text-gray-700">GPU 租赁成本</label>
+                                <div class="flex items-center">
+                                    <input type="number" id="gpuRentalCost" class="input-field" value="2.00" step="0.01">
+                                    <span class="unit-label">USD/hr</span>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="utilizationRate" class="font-medium text-gray-700">有效利用率</label>
+                                <div class="flex items-center">
+                                    <input type="number" id="utilizationRate" class="input-field" value="75" max="100" min="0">
+                                    <span class="unit-label">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="section-title">典型请求负载</h2>
+                        <p class="text-sm text-gray-500 mb-4">定义一个典型 API 请求包含的 Token 数量。</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="input-group">
+                                <label for="inputTokens" class="font-medium text-gray-700">输入 Tokens</label>
+                                <input type="number" id="inputTokens" class="input-field" value="1000">
+                            </div>
+                            <div class="input-group">
+                                <label for="outputTokens" class="font-medium text-gray-700">输出 Tokens</label>
+                                <input type="number" id="outputTokens" class="input-field" value="4000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="section-title">性能与定价</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="input-group">
+                                <label for="inputThroughput" class="font-medium text-gray-700">输入吞吐 (Prefill)</label>
+                                <input type="number" id="inputThroughput" class="input-field" value="2000">
+                                <span class="text-xs text-gray-500">Tokens/s/GPU</span>
+                            </div>
+                            <div class="input-group">
+                                <label for="outputThroughput" class="font-medium text-gray-700">输出吞吐 (Decode)</label>
+                                <input type="number" id="outputThroughput" class="input-field" value="400">
+                                <span class="text-xs text-gray-500">Tokens/s/GPU</span>
+                            </div>
+                            <div class="input-group">
+                                <label for="inputPrice" class="font-medium text-gray-700">输入 Token 定价</label>
+                                <input type="number" id="inputPrice" class="input-field" value="1.00" step="0.01">
+                                <span class="text-xs text-gray-500">USD/M Tokens</span>
+                            </div>
+                            <div class="input-group">
+                                <label for="outputPrice" class="font-medium text-gray-700">输出 Token 定价</label>
+                                <input type="number" id="outputPrice" class="input-field" value="2.00" step="0.01">
+                                <span class="text-xs text-gray-500">USD/M Tokens</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculated Results Section -->
+                <div class="space-y-6 bg-gray-50 p-6 rounded-lg border">
+                    <h2 class="section-title">计算结果</h2>
+
+                    <div class="space-y-2">
+                        <h3 class="font-medium text-gray-700">混合推理成本</h3>
+                        <p class="text-gray-500 text-sm">根据负载混合比，每处理 1M Token 的平均硬件成本。</p>
+                        <div>
+                            <span id="computeCostResult" class="result-value">$0.000</span>
+                            <span class="unit-label">/ M Tokens</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <h3 class="font-medium text-gray-700">混合平均售价</h3>
+                        <p class="text-gray-500 text-sm">根据负载混合比和定价，每售出 1M Token 的平均收入。</p>
+                        <div>
+                            <span id="blendedPriceResult" class="result-value">$0.000</span>
+                            <span class="unit-label">/ M Tokens</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-medium text-gray-700">毛利率 (Gross Margin)</h3>
+                        <p class="text-gray-500 text-sm">（总收入 - 总成本）/ 总收入</p>
+                        <div>
+                            <span id="grossMarginResult" class="result-value">0.0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 pt-4 border-t mt-4">
+                        <h3 class="font-medium text-gray-700">中间值</h3>
+                        <div class="text-sm space-y-2 text-gray-600">
+                           <p>每小时有效收入: <strong id="revenuePerHour" class="font-mono text-gray-800"></strong></p>
+                           <p>每小时总有效 Tokens: <strong id="totalTokensPerHour" class="font-mono text-gray-800"></strong></p>
+                           <p>单个请求耗时: <strong id="timePerRequest" class="font-mono text-gray-800"></strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center mt-8 text-sm text-gray-500">
+            <p>数据和计算逻辑源自 SemiAnalysis，并根据输入/输出分离模式进行扩展。</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- DOM Element References ---
+        const gpuRentalCostInput = document.getElementById('gpuRentalCost');
+        const utilizationRateInput = document.getElementById('utilizationRate');
+        const inputTokensInput = document.getElementById('inputTokens');
+        const outputTokensInput = document.getElementById('outputTokens');
+        const inputThroughputInput = document.getElementById('inputThroughput');
+        const outputThroughputInput = document.getElementById('outputThroughput');
+        const inputPriceInput = document.getElementById('inputPrice');
+        const outputPriceInput = document.getElementById('outputPrice');
+        
+        const computeCostResultEl = document.getElementById('computeCostResult');
+        const blendedPriceResultEl = document.getElementById('blendedPriceResult');
+        const grossMarginResultEl = document.getElementById('grossMarginResult');
+        const revenuePerHourEl = document.getElementById('revenuePerHour');
+        const totalTokensPerHourEl = document.getElementById('totalTokensPerHour');
+        const timePerRequestEl = document.getElementById('timePerRequest');
+
+        /**
+         * Reads input values, calculates costs and margins, and updates the UI.
+         */
+        function calculate() {
+            // --- 1. Get values from input fields ---
+            const gpuRentalCost = parseFloat(gpuRentalCostInput.value) || 0;
+            const utilizationRate = parseFloat(utilizationRateInput.value) || 0;
+            const inputTokens = parseFloat(inputTokensInput.value) || 0;
+            const outputTokens = parseFloat(outputTokensInput.value) || 0;
+            const inputThroughput = parseFloat(inputThroughputInput.value) || 0;
+            const outputThroughput = parseFloat(outputThroughputInput.value) || 0;
+            const inputPrice = parseFloat(inputPriceInput.value) || 0;
+            const outputPrice = parseFloat(outputPriceInput.value) || 0;
+
+            // --- 2. Perform Calculations ---
+
+            // Calculate time for a single request
+            const timeForInput = inputThroughput > 0 ? inputTokens / inputThroughput : 0;
+            const timeForOutput = outputThroughput > 0 ? outputTokens / outputThroughput : 0;
+            const timePerRequest = timeForInput + timeForOutput;
+
+            // Calculate total requests per hour at 100% utilization
+            const requestsPerHourFull = timePerRequest > 0 ? 3600 / timePerRequest : 0;
+            
+            // Factor in effective utilization
+            const effectiveRequestsPerHour = requestsPerHourFull * (utilizationRate / 100);
+
+            // Calculate total input and output tokens processed per hour
+            const totalInputTokensPerHour = effectiveRequestsPerHour * inputTokens;
+            const totalOutputTokensPerHour = effectiveRequestsPerHour * outputTokens;
+            const totalTokensPerHour = totalInputTokensPerHour + totalOutputTokensPerHour;
+
+            // Calculate total revenue per hour
+            const revenueFromInput = (totalInputTokensPerHour / 1000000) * inputPrice;
+            const revenueFromOutput = (totalOutputTokensPerHour / 1000000) * outputPrice;
+            const totalRevenuePerHour = revenueFromInput + revenueFromOutput;
+
+            // Calculate blended (average) metrics
+            const blendedSellingPrice = totalTokensPerHour > 0 ? (totalRevenuePerHour / totalTokensPerHour) * 1000000 : 0;
+            const computeCostPerMillion = totalTokensPerHour > 0 ? (gpuRentalCost / totalTokensPerHour) * 1000000 : 0;
+            
+            // Calculate gross margin
+            const grossMargin = totalRevenuePerHour > 0 ? ((totalRevenuePerHour - gpuRentalCost) / totalRevenuePerHour) * 100 : 0;
+
+            // --- 3. Update the UI with formatted results ---
+            computeCostResultEl.textContent = `$${computeCostPerMillion.toFixed(3)}`;
+            blendedPriceResultEl.textContent = `$${blendedSellingPrice.toFixed(3)}`;
+            grossMarginResultEl.textContent = `${grossMargin.toFixed(1)}%`;
+            
+            revenuePerHourEl.textContent = `$${totalRevenuePerHour.toFixed(2)}`;
+            totalTokensPerHourEl.textContent = totalTokensPerHour.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            timePerRequestEl.textContent = `${timePerRequest.toFixed(2)}s`;
+        }
+
+        // --- Event Listeners ---
+        const inputs = [
+            gpuRentalCostInput, utilizationRateInput, inputTokensInput, outputTokensInput,
+            inputThroughputInput, outputThroughputInput, inputPriceInput, outputPriceInput
+        ];
+        
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // --- Initial Calculation ---
+        window.addEventListener('load', calculate);
+    </script>
+</body>
+</html> 
